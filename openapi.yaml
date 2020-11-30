@@ -1,0 +1,415 @@
+openapi: 3.0.1
+info:
+  title: StudentRating
+  version: 1.0.0
+servers:
+- url: https://rating.swagger.io/v2
+- url: http://rating.swagger.io/v2
+tags:
+- name: student
+  description: Everything about your students
+- name: rating
+  description: Access to Students' mark 
+- name: teacher
+  description: Operations about teacher
+paths:
+  /student:
+    put:
+      tags:
+      - student
+      summary: Update an existing student
+      operationId: updateStudent
+      requestBody:
+        description: Student object that needs to be added to the rating
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Student'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Student'
+        required: true
+      responses:
+        200:
+            description: successful operation
+            
+        400:
+          description: Invalid ID supplied
+        404:
+          description: student not found
+        405:
+          description: Validation exception
+          content: {}
+      security:
+      - rating_auth:
+        - write:students
+        - read:students
+    post:
+      tags:
+      - student
+      summary: Add a new student to the rating
+      operationId: addStudent
+      requestBody:
+        description: student object that needs to be added to the rating
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Student'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Student'
+        required: true
+      responses:
+        200:
+            description: successful operation
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Student'
+        405:
+          description: Invalid input
+          content: {}
+      security:
+      - rating_auth:
+        - write:students
+        - read:students
+      x-codegen-request-body-name: body
+  /student/{studentId}:
+   
+    delete:
+      tags:
+      - student
+      summary: Deletes a student
+      operationId: deleteStudent
+      parameters:
+      - name: api_key
+        in: header
+        schema:
+          type: string
+      - name: studentId
+        in: path
+        description: student id to delete
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+            description: successful operation
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Student'
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: student not found
+          content: {}
+      security:
+      - rating_auth:
+        - write:students
+        - read:students
+
+  /rating/{sorted_rating}:
+    get:
+      tags:
+      - rating
+      description: Returns a list of best rating values
+      operationId: Get_sorted_rating
+      parameters:
+      - name: sorted_rating
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Rating'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rating'
+
+      
+  /rating/{ratingId}:
+    put:
+        tags:
+        - rating
+        summary: Update an existing rating
+        operationId: updateRating
+        parameters:
+        - name: ratingId
+          in: path
+          description: ID of mark that needs to be fetched
+          required: true
+          schema:
+             $ref: '#/components/schemas/Rating'
+        requestBody:
+          description: Rating object that needs to be updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rating'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Rating'
+          required: true
+        responses:
+          200:
+              description: successful operation
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/Rating'
+          400:
+            description: Invalid ID supplied
+            content: {}
+          404:
+            description: rating not found
+            content: {}
+          405:
+            description: Validation exception
+            content: {}
+        security:
+        - rating_auth:
+          - write:students
+          - read:students
+        x-codegen-request-body-name: body
+    get:
+      tags:
+      - rating
+      summary: Find rating by ID
+      description: For valid response try integer IDs with value >= 0
+      operationId: getMarkById
+      parameters:
+      - name: ratingId
+        in: path
+        description: ID of mark that needs to be fetched
+        required: true
+        schema:
+          maximum: 10.0
+          minimum: 1.0
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Rating'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rating'
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: Rating not found
+          content: {}
+    delete:
+      tags:
+      - rating
+      summary: Delete rating by ID
+      description: For valid response try integer IDs with positive integer value.         Negative
+        or non-integer values will generate API errors
+      operationId: deleteMark
+      parameters:
+      - name: ratingId
+        in: path
+        description: ID of the mark that needs to be deleted
+        required: true
+        schema:
+          minimum: 1.0
+          type: integer
+          format: int64
+      responses:
+        200:
+            description: successful operation
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Rating'
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: Mark not found
+          content: {}
+  /teacher:
+    post:
+      tags:
+      - teacher
+      summary: Create teacher
+      description: This can only be done by the logged in teacher.
+      operationId: createTeacher
+      requestBody:
+        description: Created teacher object
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Teacher'
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content: {}
+      x-codegen-request-body-name: body
+  /teacher/login:
+    get:
+      tags:
+      - teacher
+      summary: Logs teacher into the system
+      operationId: loginTeacher
+      parameters:
+      - name: username
+        in: query
+        description: The user name for login
+        required: true
+        schema:
+          type: string
+      - name: password
+        in: query
+        description: The password for login in clear text
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        400:
+          description: Invalid username/password supplied
+          content: {}
+  /teacher/logout:
+    get:
+      tags:
+      - teacher
+      summary: Logs out current logged in teacher session
+      operationId: logoutTeacher
+      responses:
+        200:
+          description: successful operation
+          content: {}
+          
+      security:
+      - rating_auth:
+        - write:students
+        - read:students
+      x-codegen-request-body-name: body
+  /teacher/{username}:
+    
+    delete:
+      tags:
+      - teacher
+      summary: Delete teacher
+      description: This can only be done by the logged in user.
+      operationId: deleteTeacher
+      parameters:
+      - name: username
+        in: path
+        description: The name that needs to be deleted
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+            description: successful operation
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Teacher'
+        400:
+          description: Invalid username supplied
+          content: {}
+        404:
+          description: teacher not found
+          content: {}
+      security:
+      - rating_auth:
+        - write:students
+        - read:students
+      x-codegen-request-body-name: body
+components:
+  schemas:
+    Rating:
+          type: object
+          properties:
+            rid:
+              type: integer
+              format: int64
+            sid:
+              type: integer
+              format: int64
+            subject:
+              type: string
+            value:
+              type: integer
+              format: int64
+          xml:
+            name: Mark
+    Teacher:
+      type: object
+      properties:
+        tid:
+          type: integer
+          format: int64
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        password:
+          type: string
+      xml:
+        name: Teacher
+    Student:
+      required:
+      - name
+      type: object
+      properties:
+        sid:
+          type: integer
+          format: int64 
+        firstname:
+          type: string
+        lastname:
+          type: string
+        total_rating:
+          type: integer
+          format: int64
+      xml:
+        name: Student
+  securitySchemes:
+      rating_auth:
+        type: oauth2
+        flows:
+          implicit:
+            authorizationUrl: http://petstore.swagger.io/oauth/dialog
+            scopes:
+              write:credits: modify students' data
+              read:credits: read data about student
+     
