@@ -8,42 +8,10 @@ servers:
 tags:
 - name: student
   description: Everything about your students
-- name: rating
-  description: Access to Students' mark 
 - name: teacher
   description: Operations about teacher
 paths:
   /student:
-    put:
-      tags:
-      - student
-      summary: Update an existing student
-      operationId: updateStudent
-      requestBody:
-        description: Student object that needs to be added to the rating
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Student'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/Student'
-        required: true
-      responses:
-        200:
-            description: successful operation
-            
-        400:
-          description: Invalid ID supplied
-        404:
-          description: student not found
-        405:
-          description: Validation exception
-          content: {}
-      security:
-      - rating_auth:
-        - write:students
-        - read:students
     post:
       tags:
       - student
@@ -74,7 +42,63 @@ paths:
         - write:students
         - read:students
       x-codegen-request-body-name: body
-  /student/{studentId}:
+      
+    get:
+      tags:
+      - student
+      description: Returns a list of best rating values
+      operationId: Get_sorted_rating
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Student'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        404:
+          description: students not found
+        
+    
+      
+  /student/{sid}:
+    put:
+      tags:
+      - student
+      summary: Updates a rating of student
+      operationId: updateStudentWithForm
+      parameters:
+      - name: sid
+        in: path
+        description: ID of student that needs to be updated
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              properties:
+                name:
+                  type: string
+                  description: Updated name of the student
+                status:
+                  type: string
+                  description: Updated status of the student
+      responses:
+        200:
+            description: successful operation
+        405:
+          description: Invalid input
+          content: {}
+      security:
+      - rating_auth:
+        - write:students
+        - read:students
+        
    
     delete:
       tags:
@@ -82,11 +106,7 @@ paths:
       summary: Deletes a student
       operationId: deleteStudent
       parameters:
-      - name: api_key
-        in: header
-        schema:
-          type: string
-      - name: studentId
+      - name: sid
         in: path
         description: student id to delete
         required: true
@@ -110,137 +130,9 @@ paths:
       - rating_auth:
         - write:students
         - read:students
+        
 
-  /rating/{sorted_rating}:
-    get:
-      tags:
-      - rating
-      description: Returns a list of best rating values
-      operationId: Get_sorted_rating
-      parameters:
-      - name: sorted_rating
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Rating'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Rating'
-
-      
-  /rating/{ratingId}:
-    put:
-        tags:
-        - rating
-        summary: Update an existing rating
-        operationId: updateRating
-        parameters:
-        - name: ratingId
-          in: path
-          description: ID of mark that needs to be fetched
-          required: true
-          schema:
-             $ref: '#/components/schemas/Rating'
-        requestBody:
-          description: Rating object that needs to be updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Rating'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Rating'
-          required: true
-        responses:
-          200:
-              description: successful operation
-              content:
-                application/json:
-                  schema:
-                    $ref: '#/components/schemas/Rating'
-          400:
-            description: Invalid ID supplied
-            content: {}
-          404:
-            description: rating not found
-            content: {}
-          405:
-            description: Validation exception
-            content: {}
-        security:
-        - rating_auth:
-          - write:students
-          - read:students
-        x-codegen-request-body-name: body
-    get:
-      tags:
-      - rating
-      summary: Find rating by ID
-      description: For valid response try integer IDs with value >= 0
-      operationId: getMarkById
-      parameters:
-      - name: ratingId
-        in: path
-        description: ID of mark that needs to be fetched
-        required: true
-        schema:
-          maximum: 10.0
-          minimum: 1.0
-          type: integer
-          format: int64
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Rating'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Rating'
-        400:
-          description: Invalid ID supplied
-          content: {}
-        404:
-          description: Rating not found
-          content: {}
-    delete:
-      tags:
-      - rating
-      summary: Delete rating by ID
-      description: For valid response try integer IDs with positive integer value.         Negative
-        or non-integer values will generate API errors
-      operationId: deleteMark
-      parameters:
-      - name: ratingId
-        in: path
-        description: ID of the mark that needs to be deleted
-        required: true
-        schema:
-          minimum: 1.0
-          type: integer
-          format: int64
-      responses:
-        200:
-            description: successful operation
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Rating'
-        400:
-          description: Invalid ID supplied
-          content: {}
-        404:
-          description: Mark not found
-          content: {}
+  
   /teacher:
     post:
       tags:
@@ -354,22 +246,6 @@ paths:
       x-codegen-request-body-name: body
 components:
   schemas:
-    Rating:
-          type: object
-          properties:
-            rid:
-              type: integer
-              format: int64
-            sid:
-              type: integer
-              format: int64
-            subject:
-              type: string
-            value:
-              type: integer
-              format: int64
-          xml:
-            name: Mark
     Teacher:
       type: object
       properties:
