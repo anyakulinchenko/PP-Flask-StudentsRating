@@ -11,6 +11,8 @@ flask-script = "*"
 flask-migrate = "*"
 flask-sqlalchemy = "*"
 mysql-connector-python = "*"
+werkzeug = "*"
+flask-jwt-extended = "*"
 
 [requires]
 python_version = "3.6"
