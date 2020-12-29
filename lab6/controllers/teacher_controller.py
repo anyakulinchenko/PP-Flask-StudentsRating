@@ -1,10 +1,7 @@
 from werkzeug.security import check_password_hash
-from flask_jwt_extended import create_access_token
 from config import *
 from models import *
 
-def get_current_teacher():
-    return Teacher.query.filter_by(username=get_jwt_identity()).first()
 
 @app.route('/teacher', methods=['POST'])
 def create_teacher():
@@ -42,15 +39,17 @@ def teacher_login():
 
 
 @app.route('/teacher/logout', methods=['GET'])
+@auth.login_required
 def teacher_logout():
     return jsonify({"message": "success"}), 200
 
 
 @app.route('/teacher/<tid>', methods=['DELETE'])
+@auth.login_required
 def delete_teacher(tid):
     teacher = Teacher.query.get(tid)
     if teacher is None:
         return jsonify(status='Teacher not found'), 404
     db.session.delete(teacher)
     db.session.commit()
-    return jsonify(status='deleted'), 200
+    return jsonify(status='deleted'), 201

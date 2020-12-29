@@ -1,6 +1,7 @@
 from migrate import db
 from werkzeug.security import generate_password_hash
 
+
 Base = db.Model
 
 

@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 
 app = Flask(__name__)
 app.debug = True
-app.config['SECRET_KEY'] = 'secret key'
+app.config['SECRET_KEY'] = '123456789'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://{user}:{password}@{server}/{database}'.format(
     user='root', password='1111', server='localhost', database='mydb')
 

@@ -1,11 +1,13 @@
 from werkzeug.security import check_password_hash
-from flask_jwt_extended import create_access_token
 from config import *
 from models import *
+from flask import request, jsonify, json
+
 
 
 
 @app.route('/student', methods=['POST'])
+@auth.login_required
 def post_student():
     if not request.is_json:
         return jsonify({"msg": "Missing JSON in request"}), 400
@@ -28,6 +30,7 @@ def get_students():
 
 
 @app.route('/student/<sid>', methods=['PUT'])
+@auth.login_required
 def put_student(sid):
     student = Student.query.get(sid)
     if student is None:
@@ -41,12 +44,13 @@ def put_student(sid):
 
 
 @app.route('/student/<sid>', methods=['DELETE'])
+@auth.login_required
 def delete_student(sid):
     student = Student.query.get(sid)
     if student is None:
         return jsonify(status='student not found'), 404
     db.session.delete(student)
     db.session.commit()
-    return jsonify(status='deleted'), 200
+    return jsonify(status='deleted'), 201
 
 
