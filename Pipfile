@@ -7,6 +7,15 @@ verify_ssl = true
 
 [packages]
 flask = "*"
+flask-script = "*"
+flask-migrate = "*"
+flask-sqlalchemy = "*"
+mysql-connector-python = "*"
+werkzeug = "*"
+flask-jwt-extended = "*"
+flask-httpauth = "*"
+flask-testing = "*"
+coverage = "*"
 
 [requires]
 python_version = "3.6"
