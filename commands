@@ -1,0 +1,5 @@
+alembic init alembic
+alembic revision --autogenerate
+alembic upgrade head
+
+set GLOBAL time_zone = '+3:00'
